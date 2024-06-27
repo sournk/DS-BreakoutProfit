@@ -2,11 +2,14 @@
 //|                                                CDKSymbolInfo.mqh |
 //|                                                  Denis Kislitsyn |
 //|                                             https://kislitsyn.me |
+//| 2024-06-26:
+//|   [+] AddPrice() funcs
 //+------------------------------------------------------------------+
 #property copyright "Denis Kislitsyn"
 #property link      "https://kislitsyn.me"
 
 #include <Trade\SymbolInfo.mqh>
+#include "..\Common\DKStdLib.mqh"
 
 class CDKSymbolInfo : public CSymbolInfo {
 private:
@@ -20,6 +23,9 @@ public:
   
   double              GetPriceToOpen(const ENUM_POSITION_TYPE aPositionDirection);     // Returns market price Ask or Bid to OPEN new pos with aPositionDirection dir
   double              GetPriceToClose(const ENUM_POSITION_TYPE aPositionDirection);    // Returns market price Ask or Bid to CLOSE new pos with aPositionDirection dir
+  
+  double              AddToPrice(const ENUM_POSITION_TYPE _dir, double _price_base, const double _price_addition);
+  double              AddToPrice(const ENUM_POSITION_TYPE _dir, const double _price_base, const int _distance_addition);
   
   double              NormalizeLot(double lot, const bool _floor = true);              // Returns normalized lots size for symbol
   
@@ -100,6 +106,14 @@ double CDKSymbolInfo::GetPriceToClose(const ENUM_POSITION_TYPE aPositionDirectio
   if (aPositionDirection == POSITION_TYPE_BUY)  return Bid();
   if (aPositionDirection == POSITION_TYPE_SELL) return Ask();
   return 0;   
+}
+
+double CDKSymbolInfo::AddToPrice(const ENUM_POSITION_TYPE _dir, double _price_base, const double _price_addition) {
+  return _price_base + GetPosDirSign(_dir)*_price_addition;
+}
+
+double CDKSymbolInfo::AddToPrice(const ENUM_POSITION_TYPE _dir, const double _price_base, const int _distance_addition) {
+  return AddToPrice(_dir, _price_base, PointsToPrice(_distance_addition));
 }
 
 //+------------------------------------------------------------------+
